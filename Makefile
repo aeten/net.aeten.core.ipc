@@ -1,5 +1,6 @@
 SOURCE_VERSION = 1.7
 JFLAGS ?= -g:source,lines,vars -encoding utf8
+CFLAGS ?= -g
 TOUCH_DIR = .touch
 
 
@@ -8,7 +9,11 @@ all: compile jar eclipse src
 # Sources
 SRC = core ipc
 src: $(SRC)
-ipc::          core
+ipc:: ipc.jni core
+ipc.jni:
+	gcc -nocpp -std=gnu99 -fPIC -shared $(CFLAGS) $(IPC_HEADERS) src/net.aeten.core.ipc/net/aeten/core/ipc/jni_socket.c -o src/net.aeten.core.ipc/net/aeten/core/ipc/linux-x86_64/libjnisocket.so
+	gcc -nocpp -std=gnu99 -fPIC -shared $(CFLAGS) $(IPC_HEADERS) src/net.aeten.core.ipc/net/aeten/core/ipc/jni_ioctl.c -o src/net.aeten.core.ipc/net/aeten/core/ipc/linux-x86_64/libjniioctl.so
+
 
 # COTS
 COTS = jcip.annotations slf4j slf4j.simple
@@ -25,8 +30,4 @@ SRC_DIRS = src/
 MODULES = $(SRC) $(COTS)
 include Java-make/java.mk
 
-define pre.ipc
-	$(eval JAVA_HOME = $(shell dirname $(shell dirname $(shell readlink -f `which $(JAVAC)`))))
-	-mkdir --parents $(BUILD_DIR)/$(MODULE)/net/aeten/core/ipc/linux-x86_64/
-	gcc -nocpp -std=gnu99 -fPIC -shared -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/linux src/$(MODULE)/net/aeten/core/ipc/posix_socket_jni.c -o $(BUILD_DIR)/$(MODULE)/net/aeten/core/ipc/linux-x86_64/libposixsocket.so
-endef
+IPC_HEADERS = -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/linux -Isrc/net.aeten.core
