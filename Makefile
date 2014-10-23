@@ -11,6 +11,7 @@ SRC = core ipc
 src: $(SRC)
 ipc:: ipc.jni core
 ipc.jni:
+	-mkdir --parent src/net.aeten.core.ipc/net/aeten/core/ipc/linux-x86_64/
 	gcc -nocpp -std=gnu99 -fPIC -shared $(CFLAGS) $(IPC_HEADERS) src/net.aeten.core.ipc/net/aeten/core/ipc/jni_socket.c -o src/net.aeten.core.ipc/net/aeten/core/ipc/linux-x86_64/libjnisocket.so
 	gcc -nocpp -std=gnu99 -fPIC -shared $(CFLAGS) $(IPC_HEADERS) src/net.aeten.core.ipc/net/aeten/core/ipc/jni_ioctl.c -o src/net.aeten.core.ipc/net/aeten/core/ipc/linux-x86_64/libjniioctl.so
 
