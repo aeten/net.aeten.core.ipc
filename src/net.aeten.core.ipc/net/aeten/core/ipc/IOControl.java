@@ -164,5 +164,6 @@ public class IOControl {
 	static native final void _ifreq_set_ifr_name(byte[] ifreq, String name);
 
 	static native final byte[] _ifreq_get_ifr_address(byte[] ifreq);
+	static native final int _ifreq_get_ifr_index(byte[] ifreq);
 
 }

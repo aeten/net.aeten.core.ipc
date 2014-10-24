@@ -106,45 +106,52 @@ public class Socket {
 			BindError {
 		// _setsockopt_string(sockfd, SOL_SOCKET, SO_BINDTODEVICE, device);
 		// bind((String)null, port);
-		bind(getDeviceAddress(device), port);
+		try {
+			bind(InetAddress.getByAddress(getDevice(device).getAddress())
+					.getHostAddress(), port);
+		} catch (UnknownHostException exception) { // Should not happen
+			throw new SocketOptionError(exception);
+		}
 	}
 
-	public InetAddress getDeviceAddress(String device) throws SocketOptionError {
+	public Device getDevice(String device) throws SocketOptionError {
 		try {
 			byte[] ifreq = IOControl._new_ifreq();
 			IOControl._ifreq_set_ifr_name(ifreq, device);
 			byte[] ifconf = IOControl._new_ifconf(new byte[][] { ifreq });
 			IOControl._ioctl(sockfd, IOControl.SIOCGIFCONF, ifconf, 0,
 					ifconf.length);
-			// IOControl._ioctl(sockfd, IOControl.SIOCGIFINDEX, ifreq, 0,
-			// ifreq.length); // Not need ?
+			IOControl._ioctl(sockfd, IOControl.SIOCGIFINDEX, ifreq, 0,
+					ifreq.length);
 			IOControl._ioctl(sockfd, IOControl.SIOCGIFADDR, ifreq, 0,
 					ifreq.length);
 			byte[] in_addr = IOControl._ifreq_get_ifr_address(ifreq);
-			return InetAddress.getByAddress(in_addr);
-		} catch (UnknownHostException exception) { // Should not happen
-			throw new SocketOptionError(exception);
+			int if_index = IOControl._ifreq_get_ifr_index(ifreq);
+			return new Device(device, if_index, in_addr);
 		} catch (IOControlError error) {
 			throw new SocketOptionError(error);
 		}
 
 	}
 
-	public void joinGroupFromDevice(String groupAddress,
-			InetAddress interfaceAddress) throws SocketOptionError {
-		byte[] ip_mreq = _new_ip_mreq(groupAddress,
-				interfaceAddress.getHostAddress());
-		_setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, ip_mreq, 0,
-				ip_mreq.length);
-	}
-
 	public void joinGroupFromDevice(String groupAddress, String device)
 			throws SocketOptionError {
-		joinGroupFromDevice(groupAddress, getDeviceAddress(device));
+		Device dev = getDevice(device);
+		try {
+			byte[] ip_mreq = _new_ip_mreq(groupAddress, InetAddress
+					.getByAddress(dev.getAddress()).getHostAddress(),
+					dev.getIndex());
+			_setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, ip_mreq, 0,
+					ip_mreq.length);
+		} catch (UnknownHostException exception) { // Should not happen
+			throw new SocketOptionError(exception);
+		}
 	}
 
 	public void joinGroup(String groupAddress) throws SocketOptionError {
-		joinGroupFromDevice(groupAddress, (String) null);
+		byte[] ip_mreq = _new_ip_mreq(groupAddress, null, 0);
+		_setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, ip_mreq, 0,
+				ip_mreq.length);
 	}
 
 	public void close() throws SocketError {
@@ -180,7 +187,7 @@ public class Socket {
 			String ipi_spec_dst, String ipi_addr);
 
 	private static native byte[] _new_ip_mreq(String group,
-			String interfaceAddress);
+			String interfaceAddress, int interface_index);
 
 	public static void main(String[] args) {
 		Socket socket = null;
@@ -190,8 +197,8 @@ public class Socket {
 			socket.setReuse(true);
 			socket.setTtl(10);
 			socket.setUseLoop(true);
-			// socket.joinGroup("225.0.0.1");
-			// socket.bindToDevice("eth0", 60001);
+//			socket.joinGroup("225.0.0.1");
+//			socket.bindToDevice("eth0", 60001);
 			socket.joinGroupFromDevice("225.0.0.1", "eth0");
 			socket.bind(60001);
 		} catch (Throwable e) {

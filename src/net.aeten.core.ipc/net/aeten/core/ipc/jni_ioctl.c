@@ -84,14 +84,26 @@ JNIEXPORT void JNICALL Java_net_aeten_core_ipc_IOControl__1ifreq_1set_1ifr_1name
  * Class:     net.aeten.core.net.ipc.IOControl
  * Method:    _ifreq_get_ifr_address([B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_net_aeten_core_ipc_IOControl__1ifreq_1get_1ifr_1address(JNIEnv *env, jclass class, jbyteArray if_idx) {
-	struct ifreq* if_idx_pointer = (struct ifreq*) (*env)->GetByteArrayElements(env, if_idx, 0);
-	struct in_addr addr = ((struct sockaddr_in*)&if_idx_pointer->ifr_ifru.ifru_addr)->sin_addr;
+JNIEXPORT jbyteArray JNICALL Java_net_aeten_core_ipc_IOControl__1ifreq_1get_1ifr_1address(JNIEnv *env, jclass class, jbyteArray ifr) {
+	struct ifreq* ifr_pointer = (struct ifreq*) (*env)->GetByteArrayElements(env, ifr, 0);
+	struct in_addr addr = ((struct sockaddr_in*)&ifr_pointer->ifr_ifru.ifru_addr)->sin_addr;
 	int length = sizeof(addr);
 	jbyteArray byte_array = (*env)->NewByteArray(env, length);
 	jbyte* pointer = (*env)->GetByteArrayElements(env, byte_array, 0);
 	memcpy(pointer, &addr, length);
 	(*env)->ReleaseByteArrayElements(env, byte_array, pointer, 0);
+	(*env)->ReleaseByteArrayElements(env, ifr, (jbyte*)ifr_pointer, 0);
 	return byte_array;
+}
+
+/*
+ * Class:     net.aeten.core.net.ipc.IOControl
+ * Method:    _ifreq_get_ifr_index(I)[B
+ */
+JNIEXPORT jint JNICALL Java_net_aeten_core_ipc_IOControl__1ifreq_1get_1ifr_1index(JNIEnv *env, jclass class, jbyteArray ifr) {
+	struct ifreq* ifr_pointer = (struct ifreq*) (*env)->GetByteArrayElements(env, ifr, 0);
+	int index = ifr_pointer->ifr_ifru.ifru_ivalue;
+	(*env)->ReleaseByteArrayElements(env, ifr, (jbyte*)ifr_pointer, 0);
+	return (jint) index;
 }
 

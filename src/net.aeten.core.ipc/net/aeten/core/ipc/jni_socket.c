@@ -75,9 +75,10 @@ JNIEXPORT jbyteArray JNICALL Java_net_aeten_core_ipc_Socket__1new_1in_1pktinfo(
  * Method:    _new_in_pktinfo()[B
  */
 JNIEXPORT jbyteArray JNICALL Java_net_aeten_core_ipc_Socket__1new_1ip_1mreq(
-		JNIEnv *env, jclass class, jstring group, jstring interface) {
+		JNIEnv *env, jclass class, jstring group, jstring interface, jint interface_index) {
 	struct ip_mreqn mreq;
 	mreq.imr_multiaddr = new_ipv4_addr(env, group);
+	mreq.imr_ifindex = interface_index;
 
 	int error = 0;
 	if (interface != NULL) {
@@ -87,6 +88,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_aeten_core_ipc_Socket__1new_1ip_1mreq(
 			error = 1;
 		}
 		(*env)->ReleaseStringUTFChars(env, interface, interface_addr);
+
 	} else {
 		mreq.imr_address.s_addr = INADDR_ANY;
 	}
