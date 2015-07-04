@@ -7,7 +7,7 @@ IPC_HEADERS = -I$(JAVA_HOME)/include/ -I$(JAVA_HOME)/include/linux -Isrc/net.aet
 IPC_JNI = net.aeten.core.ipc/net/aeten/core/ipc
 IPC_JNI_SRC = src/$(IPC_JNI)
 IPC_JNI_LIB_DIR = build/$(IPC_JNI)/linux-x86_64
-IPC_JNI_LIB = $(IPC_JNI_LIB_DIR)/libjnisocket.so $(IPC_JNI_LIB_DIR)/libjniioctl.so
+IPC_JNI_LIB = $(IPC_JNI_LIB_DIR)/libjnisocket.so $(IPC_JNI_LIB_DIR)/libjniioctl.so $(IPC_JNI_LIB_DIR)/libjniselect.so
 
 all: compile jar eclipse src
 
