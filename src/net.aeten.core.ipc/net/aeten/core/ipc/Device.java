@@ -1,5 +1,10 @@
 package net.aeten.core.ipc;
 
+import java.util.Arrays;
+
+import net.jcip.annotations.Immutable;
+
+@Immutable
 public class Device {
 	private final String name;
 	private final byte[] address;
@@ -9,7 +14,7 @@ public class Device {
 	public Device(String name, int index, byte[] address) {
 		super();
 		this.name = name;
-		this.address = address;
+		this.address = Arrays.copyOf(address, address.length);
 		this.index = index;
 	}
 
@@ -26,7 +31,7 @@ public class Device {
 	 * @return the address
 	 */
 	public byte[] getAddress() {
-		return address;
+		return Arrays.copyOf(address, address.length);
 	}
 
 
