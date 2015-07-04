@@ -12,9 +12,9 @@
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST.  Usually -1 indicates error.
  * Class:     net.aeten.core.net.ipc.IOControl
- * Method:    _ioctl(III[BII)V
+ * Method:    _ioctl(III[BII)I
  */
-JNIEXPORT int JNICALL Java_net_aeten_core_ipc_IOControl__1ioctl(
+JNIEXPORT jint JNICALL Java_net_aeten_core_ipc_IOControl__1ioctl(
 		JNIEnv *env, jclass class, jint sockfd, jlong request,
 		jbyteArray optval, jint offset, jint length/*not used*/) {
 	jbyte* bufferPtr = (*env)->GetByteArrayElements(env, optval, 0);
@@ -30,14 +30,9 @@ JNIEXPORT int JNICALL Java_net_aeten_core_ipc_IOControl__1ioctl(
  * Class:     net.aeten.core.net.ipc.IOControl
  * Method:    _new_ifreq()[B
  */
-JNIEXPORT jbyteArray JNICALL Java_net_aeten_core_ipc_IOControl__1new_1ifreq(
+JNIEXPORT jint JNICALL Java_net_aeten_core_ipc_IOControl__1sizeof_1ifreq(
 		JNIEnv *env, jclass class) {
-	int length = sizeof(struct ifreq);
-	jbyteArray byte_array = (*env)->NewByteArray(env, length);
-	jbyte* pointer = (*env)->GetByteArrayElements(env, byte_array, 0);
-	memset(pointer, 0, length);
-	(*env)->ReleaseByteArrayElements(env, byte_array, pointer, 0);
-	return byte_array;
+	return sizeof(struct ifreq);
 }
 
 /*

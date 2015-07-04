@@ -116,7 +116,7 @@ public class Socket {
 
 	public Device getDevice(String device) throws SocketOptionError {
 		try {
-			byte[] ifreq = IOControl._new_ifreq();
+			byte[] ifreq = new byte[IOControl._sizeof_ifreq()];
 			IOControl._ifreq_set_ifr_name(ifreq, device);
 			byte[] ifconf = IOControl._new_ifconf(new byte[][] { ifreq });
 			IOControl._ioctl(sockfd, IOControl.SIOCGIFCONF, ifconf, 0,
@@ -174,6 +174,15 @@ public class Socket {
 
 	private static native void _bind_ipv4(int sockfd, String address, int port)
 			throws BindError;
+	
+	private static native int _recv(int sockfd, byte[] buf, int len, int flags)
+			throws SocketOptionError;
+	
+	private static native int _recvfrom(int sockfd, byte[] buf, int len, int flags, String src_addr)
+			throws SocketOptionError;
+	
+	
+	// TODO: recvmsg
 
 	/**
 	 * @param ipi_ifindex

@@ -152,7 +152,7 @@ public class IOControl {
 	 *         interface ioctl's must have parameter definitions which begin
 	 *         with ifr_name. The remainder may be interface specific.
 	 */
-	static native final byte[] _new_ifreq();
+	static native final int _sizeof_ifreq();
 
 	/**
 	 * @return Structure used in SIOCGIFCONF request. Used to retrieve interface
